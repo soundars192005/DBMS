@@ -160,3 +160,103 @@ INSERT INTO fee (student_id,semester,amount) VALUES
 (1,'2024-Spring',450.0),
 (2,'2024-Spring',450.0),
 (3,'2024-Fall',600.0);
+--------------------------------------------------------------
+                         Queries
+--------------------------------------------------------------
+1.SELECT * FROM department;
+
+2.SELECT student_id, first_name, last_name, email
+FROM student;
+
+3.SELECT p.prof_id, p.first_name, p.last_name, d.dept_name
+FROM professor p
+JOIN department d ON p.dept_id = d.dept_id;
+
+4.SELECT first_name, last_name, admission_year
+FROM student
+WHERE admission_year > 2020;
+
+5.SELECT first_name, last_name, salary
+FROM professor
+WHERE salary > 80000;
+
+6.SELECT s.student_id,
+       s.first_name || ' ' || s.last_name AS student_name,
+       d.dept_name
+FROM student s
+JOIN department d ON s.dept_id = d.dept_id;
+
+7.SELECT c.course_code, c.course_name,
+       p.first_name || ' ' || p.last_name AS professor_name
+FROM course c
+JOIN professor_course pc ON c.course_id = pc.course_id
+JOIN professor p ON pc.prof_id = p.prof_id;
+
+8.SELECT s.first_name || ' ' || s.last_name AS student_name,
+       c.course_name,
+       e.semester
+FROM enrollment e
+JOIN student s ON e.student_id = s.student_id
+JOIN course c ON e.course_id = c.course_id;
+
+9.SELECT d.dept_name, COUNT(s.student_id) AS student_count
+FROM department d
+LEFT JOIN student s ON d.dept_id = s.dept_id
+GROUP BY d.dept_name;
+
+10.SELECT d.dept_name, AVG(p.salary) AS avg_salary
+FROM professor p
+JOIN department d ON p.dept_id = d.dept_id
+GROUP BY d.dept_name;
+
+11.SELECT semester, SUM(amount) AS total_fees
+FROM fee
+GROUP BY semester;
+
+12.SELECT first_name, last_name, salary
+FROM professor
+WHERE salary > (SELECT AVG(salary) FROM professor);
+
+13.SELECT first_name, last_name
+FROM student
+WHERE student_id IN (SELECT student_id FROM fee);
+
+14.SELECT s.student_id, s.first_name, s.last_name
+FROM student s
+LEFT JOIN enrollment e ON s.student_id = e.student_id
+WHERE e.enroll_id IS NULL;
+
+15.SELECT c.course_name, p.course_name AS prerequisite
+FROM course_prerequisite cp
+JOIN course c ON cp.course_id = c.course_id
+JOIN course p ON cp.prereq_course_id = p.course_id;
+
+16.SELECT first_name, last_name, hire_date
+FROM professor
+WHERE hire_date > DATE '2020-01-01';
+
+17.SELECT first_name, last_name, dob
+FROM student
+WHERE dob > DATE '2000-01-01';
+
+18.UPDATE professor
+SET salary = salary + 5000
+WHERE dept_id = 1;
+
+19.DELETE FROM student
+WHERE student_id = 20;
+
+20.SELECT s.first_name || ' ' || s.last_name AS student_name,
+       COUNT(g.grade) AS courses_completed
+FROM student s
+JOIN enrollment e ON s.student_id = e.student_id
+JOIN grade g ON e.enroll_id = g.enroll_id
+GROUP BY s.first_name, s.last_name;
+
+21.SELECT p.first_name || ' ' || p.last_name AS professor_name,
+       COUNT(pc.course_id) AS courses_handled
+FROM professor p
+JOIN professor_course pc ON p.prof_id = pc.prof_id
+GROUP BY p.first_name, p.last_name;
+
+
