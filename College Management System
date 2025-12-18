@@ -1,0 +1,162 @@
+DROP TABLE IF EXISTS grade;
+DROP TABLE IF EXISTS fee;
+DROP TABLE IF EXISTS enrollment;
+DROP TABLE IF EXISTS professor_course;
+DROP TABLE IF EXISTS course_prerequisite;
+DROP TABLE IF EXISTS course;
+DROP TABLE IF EXISTS student;
+DROP TABLE IF EXISTS professor;
+DROP TABLE IF EXISTS department;
+CREATE TABLE department (
+dept_id INTEGER PRIMARY KEY AUTOINCREMENT,
+dept_code TEXT UNIQUE,
+dept_name TEXT NOT NULL
+);
+CREATE TABLE professor (
+prof_id INTEGER PRIMARY KEY AUTOINCREMENT,
+first_name TEXT,
+last_name TEXT,
+hire_date TEXT,
+salary REAL,
+dept_id INTEGER,
+FOREIGN KEY (dept_id) REFERENCES department(dept_id)
+);
+CREATE TABLE course (
+course_id INTEGER PRIMARY KEY AUTOINCREMENT,
+course_code TEXT UNIQUE,
+course_name TEXT,
+credits INTEGER,
+capacity INTEGER,
+dept_id INTEGER,
+FOREIGN KEY (dept_id) REFERENCES department(dept_id)
+);
+CREATE TABLE course_prerequisite (
+course_id INTEGER,
+prereq_course_id INTEGER,
+PRIMARY KEY (course_id, prereq_course_id),
+FOREIGN KEY (course_id) REFERENCES course(course_id),
+FOREIGN KEY (prereq_course_id) REFERENCES course(course_id)
+);
+CREATE TABLE professor_course (
+prof_id INTEGER,
+course_id INTEGER,
+PRIMARY KEY (prof_id, course_id),
+FOREIGN KEY (prof_id) REFERENCES professor(prof_id),
+FOREIGN KEY (course_id) REFERENCES course(course_id)
+);
+CREATE TABLE student (
+student_id INTEGER PRIMARY KEY AUTOINCREMENT,
+first_name TEXT,
+last_name TEXT,
+email TEXT UNIQUE,
+dob TEXT,
+address TEXT,
+admission_year INTEGER,
+dept_id INTEGER,
+FOREIGN KEY (dept_id) REFERENCES department(dept_id)
+);
+CREATE TABLE enrollment (
+enroll_id INTEGER PRIMARY KEY AUTOINCREMENT,
+student_id INTEGER,
+course_id INTEGER,
+semester TEXT,
+enroll_date TEXT,
+UNIQUE (student_id, course_id, semester),
+FOREIGN KEY (student_id) REFERENCES student(student_id),
+FOREIGN KEY (course_id) REFERENCES course(course_id)
+);
+CREATE TABLE grade (
+grade_id INTEGER PRIMARY KEY AUTOINCREMENT,
+enroll_id INTEGER UNIQUE,
+prof_id INTEGER,
+grade TEXT,
+grade_date TEXT,
+FOREIGN KEY (enroll_id) REFERENCES enrollment(enroll_id),
+FOREIGN KEY (prof_id) REFERENCES professor(prof_id)
+);
+CREATE TABLE fee (
+fee_id INTEGER PRIMARY KEY AUTOINCREMENT,
+student_id INTEGER,
+semester TEXT,
+amount REAL,
+UNIQUE (student_id, semester),
+FOREIGN KEY (student_id) REFERENCES student(student_id)
+);
+INSERT INTO department (dept_code, dept_name) VALUES
+('CS','Computer Science'),
+('ME','Mechanical Engineering'),
+('EE','Electrical Engineering'),
+('CE','Civil Engineering'),
+('EC','Electronics & Communication'),
+('BT','Biotechnology');
+INSERT INTO professor (first_name, last_name, hire_date, salary, dept_id) VALUES
+('Arun','Subramanian','2019-01-10',80000,1),
+('Balaji','Krishnan','2021-03-14',72000,2),
+('Chitra','Ramanathan','2018-07-22',90000,1),
+('Dinesh','Kumar','2020-11-05',65000,3),
+('Esha','Mahadevan','2022-09-18',55000,6),
+('Farook','Hussain','2017-05-01',95000,4),
+('Gowri','Ravichandran','2021-08-02',70000,2),
+('Hari','Prasath','2020-02-16',82000,1),
+('Indira','Selvaraj','2019-04-20',78000,3),
+('Jagan','Muthusamy','2016-12-11',105000,5);
+INSERT INTO course (course_code, course_name, credits, capacity, dept_id) VALUES
+('CS101','Programming Fundamentals',3,60,1),
+('CS201','Data Structures',4,60,1),
+('CS301','Algorithms',4,50,1),
+('CS401','Machine Learning',4,50,1),
+('ME101','Thermodynamics',3,55,2),
+('EE101','Circuit Theory',3,50,3),
+('CE101','Engineering Drawing',2,50,4),
+('EC101','Digital Electronics',3,55,5),
+('BT101','Genetics',3,50,6),
+('CS350','Database Management Systems',3,60,1);
+INSERT INTO course_prerequisite VALUES
+(3,2),
+(4,3);
+INSERT INTO professor_course
+SELECT
+(SELECT MIN(prof_id) FROM professor p WHERE p.dept_id = c.dept_id),
+c.course_id
+FROM course c;
+INSERT INTO student (first_name,last_name,email,dob,address,admission_year,dept_id) VALUES
+('Arun','Kumar','arun.kumar01@apex.edu','2000-01-15','Chennai – Address 1',2020,1),
+('Karthik','Ravi','karthik.ravi02@apex.edu','2000-02-18','Coimbatore – Address 2',2019,2),
+('Sanjay','Prasath','sanjay.prasath03@apex.edu','2000-03-22','Madurai – Address 3',2021,3),
+('Vignesh','Sundar','vignesh.sundar04@apex.edu','2000-04-10','Tiruchy – Address 4',2020,4),
+('Saravanan','Murugan','saravanan.murugan05@apex.edu','2000-05-05','Salem – Address 5',2022,5),
+('Dinesh','Arumugam','dinesh.arumugam06@apex.edu','2000-06-12','Erode – Address 6',2023,6),
+('Harish','Mohan','harish.mohan07@apex.edu','2000-07-17','Thanjavur – Address 7',2021,1),
+('Praveen','Sakthivel','praveen.sakthivel08@apex.edu','2000-08-23','Vellore – Address 8',2019,2),
+('Gokul','Rajendran','gokul.rajendran09@apex.edu','2000-09-26','Kanchipuram – Address 9',2023,3),
+('Bharath','Ilango','bharath.ilango10@apex.edu','2000-10-30','Tuticorin – Address 10',2022,4),
+('Keerthana','Subramani','keerthana.subramani11@apex.edu','2000-01-28','Chennai – Address
+11',2020,5),
+('Anitha','Balasubramaniam','anitha.balasubramaniam12@apex.edu','2000-02-19','Coimbatore – Address
+12',2023,6),
+('Divya','Raghavan','divya.raghavan13@apex.edu','2000-03-14','Madurai – Address 13',2018,1),
+('Swathi','Srinivasan','swathi.srinivasan14@apex.edu','2000-04-03','Tiruchy – Address 14',2019,2),
+('Aishwarya','Natarajan','aishwarya.natarajan15@apex.edu','2000-05-21','Salem – Address
+15',2021,3),
+('Harini','Muthukumar','harini.muthukumar16@apex.edu','2000-06-07','Erode – Address 16',2020,4),
+('Priyanka','Jayakumar','priyanka.jayakumar17@apex.edu','2000-07-29','Vellore – Address
+17',2022,5),
+('Nandhini','Velmurugan','nandhini.velmurugan18@apex.edu','2000-08-11','Kanchipuram – Address
+18',2023,6),
+('Janani','Ganesan','janani.ganesan19@apex.edu','2000-09-02','Thanjavur – Address 19',2019,1),
+('Meena','Krishnamoorthy','meena.krishnamoorthy20@apex.edu','2000-10-06','Chennai – Address
+20',2021,2);
+INSERT INTO enrollment (student_id,course_id,semester,enroll_date) VALUES
+(1,1,'2024-Spring','2024-02-01'),
+(2,1,'2024-Spring','2024-02-01'),
+(3,2,'2024-Fall','2024-08-01'),
+(4,6,'2024-Spring','2024-02-01'),
+(5,7,'2024-Fall','2024-08-01');
+INSERT INTO grade (enroll_id,prof_id,grade,grade_date) VALUES
+(1,1,'A','2024-05-01'),
+(2,1,'B','2024-05-01'),
+(3,3,'A','2024-12-01');
+INSERT INTO fee (student_id,semester,amount) VALUES
+(1,'2024-Spring',450.0),
+(2,'2024-Spring',450.0),
+(3,'2024-Fall',600.0);
